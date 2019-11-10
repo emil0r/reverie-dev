@@ -1,0 +1,14 @@
+(ns {ns}.{object-ns-name}
+    (:require [reverie.core :refer [defobject]]))
+
+
+(defn handler [request object properties params]
+  [:div "My handler for " (str '{object-name})])
+
+(defobject {object-name}
+  {:table "{object-table-name}"
+   :migration {:path "{migration-path}"
+               :automatic? true}
+   :fields {}
+   :sections []}
+  {:any handler})

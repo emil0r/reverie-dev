@@ -1,0 +1,4 @@
+CREATE TABLE {object-table-name} (
+       id serial primary key not null,
+       object_id bigserial references reverie_object(id) not null
+);
