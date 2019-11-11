@@ -2,21 +2,24 @@
   (:require [clojure.java.io :as io]
             [clojure.string :as str]
             [me.raynes.fs :as fs]
-            [reverie.dev.migration.util :refer [create-migration
+            [reverie.dev.migration.util :refer [assert-exists!
+                                                create-migration
                                                 format-template
                                                 get-file-name
                                                 get-ns-name
-                                                get-project-root]]
+                                                get-project-root
+                                                migration-exists?]]
+            [reverie.system :as sys]
             [reverie.util :refer [join-paths get-table-name]]
             [taoensso.timbre :as log]))
 
 (defn create
-  ([name] (create {:root (get-project-root)} name))
-  ([{:keys [root override?]
-     :or {root (get-project-root)}
+  ([name] (create (get-project-root) name))
+  ([{:keys [root root-path override?]
+     :or {root (:root (get-project-root))
+          root-path (:root-path (get-project-root))}
      :as opts} name]
    (let [object-template (slurp (io/resource "reverie/dev/templates/object/object.template"))
-         root-path (str/replace root #"\." "/")
          object-name (str name)
          object-ns-name (get-ns-name name)
          object-file-name (get-file-name object-ns-name)
@@ -43,3 +46,29 @@
      (create-migration migration-path "initial" "reverie/dev/templates/sql/object-initial" {:object-table-name object-table-name})
      (log/info (format "Created object %s." {:migration-path migration-path
                                              :object-path object-path})))))
+
+(defn add-migration
+  ([name migration-name] (add-migration (get-project-root) name migration-name))
+  ([{:keys [root root-path]
+     :or {root (:root (get-project-root))
+          root-path (:root-path (get-project-root))}}
+    name migration-name]
+   (assert-exists! :object name)
+   (let [object-ns-name (get-ns-name name)
+         root-path (str/replace root #"\." "/")
+         migration-path (join-paths root-path "objects/migrations" object-ns-name)
+         table-name (:table (sys/object (keyword name)))]
+     (create-migration migration-path migration-name "reverie/dev/templates/sql/migration" {:table-name table-name}))))
+
+(defn remove-migration
+  ([name migration-name] (remove-migration (get-project-root) name migration-name))
+  ([{:keys [root root-path]
+     :or {root (:root (get-project-root))
+          root-path (:root-path (get-project-root))}}
+    name migration-name]
+   (let [object-ns-name (get-ns-name name)
+         root-path (str/replace root #"\." "/")
+         migration-path (join-paths root-path "objects/migrations" object-ns-name)
+         files (fs/find-files (join-paths "src" migration-path) (re-pattern (format ".+%s\\.(up|down).sql" migration-name)))]
+     (doseq [file files]
+       (fs/delete file)))))

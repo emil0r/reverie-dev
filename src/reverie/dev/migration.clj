@@ -1,5 +1,6 @@
 (ns reverie.dev.migration
   (:require [clojure.java.io :as io]
+            [reverie.dev.migration.util :refer [assert-exists!]]
             [reverie.migrator :as migrator]
             [reverie.migrator.sql :refer [get-migration-table]]
             [reverie.server :as server]
@@ -44,6 +45,7 @@
 
 
 (defn migrate [type name]
+  (assert-exists! type name)
   (let [mmap (get-migration-map
               (get-in @server/system [:database :db-specs :default :datasource])
               {:type type
@@ -53,6 +55,7 @@
     nil))
 
 (defn rollback [type name]
+  (assert-exists! type name)
   (let [mmap (get-migration-map
               (get-in @server/system [:database :db-specs :default :datasource])
               {:type type

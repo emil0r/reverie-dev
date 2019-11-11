@@ -4,7 +4,9 @@
             [clojure.string :as str]
             [me.raynes.fs :as fs]
             [migratus.core :as migratus]
-            [reverie.util :refer [join-paths]]))
+            [reverie.system :as sys]
+            [reverie.util :refer [join-paths]]
+            [taoensso.timbre :as log]))
 
 (defn get-project-root []
   (let [project (->> "project.clj"
@@ -14,7 +16,8 @@
                      (cons :version)
                      (apply hash-map))]
     (if-let [main (:main project)]
-      (-> main str (str/replace #"(\.[\w\d]+)?$" ""))
+      (let [root (-> main str (str/replace #"(\.[\w\d]+)?$" ""))]
+        {:root root :root-path (str/replace root #"\." "/" )})
       (throw (ex-info "Unable to find a main entry point for the project. This is required for finding the root path for the site." project)))))
 
 (defn get-ns-name [name]
@@ -24,7 +27,7 @@
 (defn format-template [template-path data]
   (let [template (slurp (io/resource template-path))]
     (reduce (fn [out [k v]]
-              (.replace out (format "{%s}" (name k)) v))
+              (.replace out (format "{%s}" (name k)) (name v)))
             template data)))
 
 (defn migration-exists? [migration-path migration-name]
@@ -49,3 +52,15 @@
         "down" (spit file
                      (format-template migration-template-down data))
         :nothing))))
+
+(defn assert-exists! [type name]
+  (let [types #{:object :module :raw-page :app}
+        f (case type
+            :object sys/object
+            :module sys/module
+            :raw-page sys/raw-page
+            :app sys/app
+            nil)]
+    (assert (types type) (format "Missing type: %s" types))
+   (when-not (f (keyword name))
+     (throw (ex-info (format "Missing %s loaded" type) {:name name})))))
