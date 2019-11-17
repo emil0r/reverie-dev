@@ -1,4 +1,4 @@
-(ns {ns}.{object-ns-name}
+(ns {ns}.objects.{object-ns-name}
     (:require [reverie.core :refer [defobject]]))
 
 
