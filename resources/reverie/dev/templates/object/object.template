@@ -1,5 +1,5 @@
 (ns {ns}.objects.{object-ns-name}
-    (:require [reverie.core :refer [defobject]]))
+  (:require [reverie.core :refer [defobject]]))
 
 
 (defn handler [request object properties params]
