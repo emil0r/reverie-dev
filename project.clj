@@ -1,4 +1,4 @@
-(defproject reverie-dev "0.3.0-SNAPSHOT"
+(defproject reverie-dev "0.3.0"
 
   :description "dev related tasks when developing for reverie"
 
