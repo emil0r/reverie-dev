@@ -1,0 +1,10 @@
+(ns {ns}.endpoints.{page-ns-name}
+  (:require [reverie.core :refer [defpage]]))
+
+
+(defn handler [request page properties params]
+  [:div "My handler for {url-path}"])
+
+(defpage "{url-path}"
+  {}
+  [["/" {:any handler}]])
