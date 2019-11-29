@@ -62,5 +62,6 @@
             :app sys/app
             nil)]
     (assert (types type) (format "Missing type: %s" types))
-   (when-not (f (keyword name))
-     (throw (ex-info (format "Missing %s loaded" type) {:name name})))))
+    (when-not (f (keyword name))
+      (log/warn (format "Missing %s loaded" type) {:name name})
+      (throw (ex-info (format "Missing %s loaded" type) {:name name})))))

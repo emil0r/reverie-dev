@@ -1,0 +1,3 @@
+CREATE TABLE {module-table-name} (
+       id serial primary key not null
+);

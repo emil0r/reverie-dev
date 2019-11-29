@@ -1,0 +1,22 @@
+(ns {ns}.modules.{module-ns-name}
+  (:require [reverie.core :refer [defmodule]]))
+
+
+
+;; WIP
+(defmodule {module-name}
+  {:name "{module-name}"
+   :interface? true
+   :migration {:path "{migration-path}"
+               :automatic? true}
+   :template :admin/main
+   :fields {}
+   :entities
+   {:entity1 {:name "Entity 1"
+              :table "{module-table-base-name}_entity1"
+              :interface {}
+              :fields {}
+              :sections []}
+   }}
+   
+  [])
