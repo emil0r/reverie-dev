@@ -1,0 +1,10 @@
+(ns {ns}.apps.{app-ns-name}
+  (:require [reverie.core :refer [defapp]]))
+
+
+(defn handler [request page properties params]
+  {:main [:div "My handler for " (str '{app-name})]})
+
+(defapp {app-name}
+  {}
+  [["/" {:any handler}]])
